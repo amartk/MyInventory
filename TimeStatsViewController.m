@@ -1,18 +1,18 @@
 //
-//  CategoryDetailsViewController.m
+//  TimeStatsViewController.m
 //  myInventory
 //
-//  Created by amar tk on 08/01/14.
+//  Created by amar tk on 22/01/14.
 //  Copyright (c) 2014 zoomrx. All rights reserved.
 //
 
-#import "CategoryDetailsViewController.h"
+#import "TimeStatsViewController.h"
 
-@interface CategoryDetailsViewController ()
+@interface TimeStatsViewController ()
 
 @end
 
-@implementation CategoryDetailsViewController
+@implementation TimeStatsViewController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -29,24 +29,10 @@
 	// Do any additional setup after loading the view.
 }
 
--(void)viewWillAppear:(BOOL)animated
-{
-    if (!_categoryId) {
-        self.navigationItem.rightBarButtonItem = nil;
-    }
-    
-    self.title = _category.name;
-
-}
-
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
-- (IBAction)deleteCategory:(id)sender {
-    [_delegate deleteCategoryWithId:_categoryId];
 }
 
 @end

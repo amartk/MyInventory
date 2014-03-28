@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "InventoryCategory.h"
 
 @protocol CategoryDetailsViewControllerDelegate <NSObject>
 
@@ -17,6 +18,7 @@
 @interface CategoryDetailsViewController : UIViewController
 
 @property(nonatomic) NSInteger categoryId;
+@property(nonatomic, strong) InventoryCategory *category;
 @property(nonatomic, weak) id<CategoryDetailsViewControllerDelegate> delegate;
 
 - (IBAction)deleteCategory:(id)sender;

@@ -1,21 +1,19 @@
 //
-//  StatsViewController.m
+//  TotalAssetViewController.m
 //  myInventory
 //
-//  Created by amar tk on 02/01/14.
+//  Created by amar tk on 20/01/14.
 //  Copyright (c) 2014 zoomrx. All rights reserved.
 //
 
-#import "StatsViewController.h"
+#import "TotalAssetViewController.h"
+#import "AssetTableViewCell.h"
 
-@interface StatsViewController ()
-{
-    NSArray *listOfStats;
-}
+@interface TotalAssetViewController ()
 
 @end
 
-@implementation StatsViewController
+@implementation TotalAssetViewController
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -29,7 +27,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    listOfStats = [NSArray arrayWithObjects:@"Total Asset", @"Category Stats", @"Vendor Stats", @"Purchase Time", nil];
+
     // Uncomment the following line to preserve selection between presentations.
     // self.clearsSelectionOnViewWillAppear = NO;
  
@@ -45,28 +43,38 @@
 
 #pragma mark - Table view data source
 
-//- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-//{
-//    // Return the number of sections.
-//    return 1;
-//}
-//
-//- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-//{
-//    // Return the number of rows in the section.
-//    return [listOfStats count];
-//}
-//
-//- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    static NSString *CellIdentifier = @"StatsCell";
-//    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
-//    
-//    // Configure the cell...
-//    cell.textLabel.text = [listOfStats objectAtIndex:indexPath.row];
-//    
-//    return cell;
-//}
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    // Return the number of sections.
+    return 2;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    // Return the number of rows in the section.
+    if (section == 1) {
+        return 1;
+    }
+    
+    return 5;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    static NSString *CellIdentifier = @"AssetCell";
+    AssetTableViewCell *cell = (AssetTableViewCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
+    
+    if (cell == nil) {
+        cell = [[AssetTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+    }
+    
+    cell.nameLabel.text = @"Name";
+    cell.totalValueLabel.text = [NSString stringWithFormat:@"₹ %@", @"26"];
+    cell.multiplierLabel.text = @"2 x 13";
+    // Configure the cell...
+    
+    return cell;
+}
 
 /*
 // Override to support conditional editing of the table view.
@@ -116,5 +124,25 @@
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
 }
+
 */
+
+-(void)chooseSortFieldTapped:(id)sender
+{
+    if (_sorterPickerViewController == nil) {
+        _sorterPickerViewController = [[SortPickerViewController alloc] initWithStyle:UITableViewStylePlain];
+        _sorterPickerViewController.delegate = self;
+    }
+    
+    if (_sorterPickerPopOver == nil) {
+        _sorterPickerPopOver = [[UIPopoverController alloc] initWithContentViewController:_sorterPickerViewController];
+        
+        [_sorterPickerPopOver presentPopoverFromBarButtonItem:(UIBarButtonItem *)sender permittedArrowDirections:UIPopoverArrowDirectionDown animated:YES];
+        
+    } else {
+        [_sorterPickerPopOver dismissPopoverAnimated:YES];
+        _sorterPickerPopOver = nil;
+    }
+}
+
 @end

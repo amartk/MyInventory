@@ -10,5 +10,9 @@
 #define myInventory_constants_h
 
 #define CATEGORY_FILE       @"categoryFile"
+#define ITEMS_FILE          @"itemsFile"
+
+#define APPLICATION_DOC_DIRECTORY   [NSString stringWithFormat:@"%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject]]
+#define DATABASE_NAME               @"myInventory.sqlite"
 
 #endif

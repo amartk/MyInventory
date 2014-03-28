@@ -8,11 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-@interface InventoryCategory : NSObject <NSCoding>
+@interface InventoryCategory : NSObject <NSCopying>
 
--(id) initWithName:(NSString *)name withImage:(UIImage *)image;
-
-@property (nonatomic, strong) NSString *name;
-@property (nonatomic, strong) UIImage *image;
+@property(nonatomic, strong) NSString *name, *imageName, *description;
+@property(nonatomic) NSInteger categoryId;
 
 @end

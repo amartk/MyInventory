@@ -7,12 +7,15 @@
 //
 
 #import "AppDelegate.h"
+#import "UtilityManager.h"
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+    UtilityManager *utilityManager = [UtilityManager sharedUtilityManager];
+    [utilityManager copyDatabase];
     return YES;
 }
 							

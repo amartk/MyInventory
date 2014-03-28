@@ -7,11 +7,17 @@
 //
 
 #import "ItemsViewController.h"
+#import "ItemsCell.h"
+#import "InventoryItem.h"
+#import "DBManager.h"
+
+#define NO_ITEMS_LABEL_TAG  100
+
 
 @interface ItemsViewController ()
 {
-    NSInteger count;
-    
+    NSMutableArray *availableItems;
+    DBManager *dbManager;
 }
 @end
 
@@ -29,18 +35,29 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    count = 10;
-    // Uncomment the following line to preserve selection between presentations.
-    // self.clearsSelectionOnViewWillAppear = NO;
- 
-    // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-    // self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    dbManager = [[DBManager alloc] init];
 }
 
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    self.navigationItem.leftBarButtonItem = self.editButtonItem;
+    
+    
+    availableItems = [dbManager getAllItems];
+    [self.tableView reloadData];
+    
+    if (availableItems.count > 0) {
+        [[self.view viewWithTag:NO_ITEMS_LABEL_TAG] removeFromSuperview];
+        self.navigationItem.leftBarButtonItem = self.editButtonItem;
+    } else {
+        
+        UILabel *noItemsLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        noItemsLabel.text = @"No Items Added";
+        [noItemsLabel sizeToFit];
+        noItemsLabel.center = self.view.center;
+        [noItemsLabel setTag:NO_ITEMS_LABEL_TAG];
+        [self.view addSubview:noItemsLabel];
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -49,7 +66,7 @@
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - Table view data source
+#pragma mark - Table view data source -
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -60,14 +77,23 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    return count;
+    return availableItems.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"ItemCell";
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier forIndexPath:indexPath];
 
+    ItemsCell *cell = (ItemsCell *)[self.tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (cell == nil) {
+        cell = (ItemsCell *)[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+    }
+    
+    InventoryItem *inventoryItem = (InventoryItem *)[availableItems objectAtIndex:indexPath.row];
+    //cell.itemName.text = inventoryItem.name ;
+    cell.itemName.text = [NSString stringWithFormat:@"%@ %@", inventoryItem.name , inventoryItem.categoryName];
+    cell.itemImage.image = [UIImage imageNamed:inventoryItem.imageName];
+    
     // Configure the cell...
     return cell;
 }
@@ -80,52 +106,21 @@
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        count -= 1;
+        //remove the item from DB
+        InventoryItem *inventoryItem = (InventoryItem *)[availableItems objectAtIndex:indexPath.row];
+        
+        [dbManager deleteItemWithId:inventoryItem.itemId];
+        
+        [availableItems removeObjectAtIndex:indexPath.row];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+
+        if (availableItems.count == 0) {
+            self.navigationItem.leftBarButtonItem = nil;
+        }
         
     }
 }
 
-/*
-// Override to support conditional editing of the table view.
-- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the specified item to be editable.
-    return YES;
-}
-*/
-
-/*
-// Override to support editing the table view.
-- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (editingStyle == UITableViewCellEditingStyleDelete) {
-        // Delete the row from the data source
-        [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-    }   
-    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-    }   
-}
-*/
-
-/*
-// Override to support rearranging the table view.
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-{
-}
-*/
-
-/*
-// Override to support conditional rearranging of the table view.
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    // Return NO if you do not want the item to be re-orderable.
-    return YES;
-}
-*/
-
-/*
 #pragma mark - Navigation
 
 // In a story board-based application, you will often want to do a little preparation before navigation
@@ -133,8 +128,43 @@
 {
     // Get the new view controller using [segue destinationViewController].
     // Pass the selected object to the new view controller.
+    if ([segue.identifier isEqualToString:@"AddItem"]) {
+        
+        UINavigationController *newItemNavController = segue.destinationViewController;
+        NewItemViewController *newItemViewController = (NewItemViewController *)[[newItemNavController viewControllers] objectAtIndex:0];
+        newItemViewController.delegate = self;
+        
+    } else if ([segue.identifier isEqualToString:@"DetailItem"]) {
+        
+        DetailItemsViewController *detailItemsViewController = (DetailItemsViewController *)segue.destinationViewController;
+        NSIndexPath *path = [self.tableView indexPathForSelectedRow];
+        InventoryItem *item = [availableItems objectAtIndex:path.row];
+        detailItemsViewController.inventoryItem = item;
+        detailItemsViewController.delegate = self;
+    }
+
 }
 
- */
+#pragma mark - NewItemDelegate -
+
+-(void)newItemAdded:(InventoryItem *)inventoryItem
+{
+    inventoryItem.itemId = [dbManager insertIntoItemsTable:inventoryItem];
+    [availableItems addObject:inventoryItem];
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+-(void)addItemCancelled
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+#pragma mark -Detail Items Delegate -
+
+-(void)deleteItemWithId:(NSInteger)itemId
+{
+    [dbManager deleteItemWithId:itemId];
+    [self.navigationController popViewControllerAnimated:YES];
+}
 
 @end

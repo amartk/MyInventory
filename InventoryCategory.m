@@ -10,30 +10,21 @@
 
 @implementation InventoryCategory
 
-@synthesize name, image;
-
--(id)initWithName:(NSString *)mName withImage:(UIImage *)mImage
+-(id)copyWithZone:(NSZone *)zone
 {
-    if (self = [super init]) {
-        self.name = mName;
-        self.image = mImage;
+    InventoryCategory *inventoryCategory = [[InventoryCategory alloc] init];
+    
+    if (inventoryCategory != nil) {
+        
+        [inventoryCategory setCategoryId:_categoryId];
+        [inventoryCategory setName:[_name copyWithZone:zone]];
+        [inventoryCategory setImageName:[_imageName copyWithZone:zone]];
+        [inventoryCategory setDescription:[_description copyWithZone:zone]];
     }
-    return self;
+    
+    return inventoryCategory;
 }
 
--(id)initWithCoder:(NSCoder *)aDecoder
-{
-    if (self = [super init]) {
-        self.name = [aDecoder decodeObjectForKey:@"CLASS_NAME"];
-        self.image = [aDecoder decodeObjectForKey:@"CLASS_IMAGE"];
-    }
-    return self;
-}
 
--(void)encodeWithCoder:(NSCoder *)aCoder
-{
-    [aCoder encodeObject:name forKey:@"CLASS_NAME"];
-    [aCoder encodeObject:image forKey:@"CLASS_IMAGE"];
-}
 
 @end

@@ -124,7 +124,7 @@
 
     InventoryCategory *inventoryCategory = [[InventoryCategory alloc] init];
     inventoryCategory.name = @"myNew Category";
-    inventoryCategory.image = [UIImage imageNamed:@"object.png"];
+    inventoryCategory.imageName = @"object.png";
     
     [self.delegate didAddCategory:inventoryCategory];
 

@@ -9,12 +9,12 @@
 #import "CategoryViewController.h"
 #import "InventoryCategory.h"
 #import "CategoryCell.h"
-#import "constants.h"
+#import "DBManager.h"
 
 @interface CategoryViewController ()
 {
     NSMutableArray *availableCategories;
-    NSString *categoryFile;
+    DBManager *dbManager;
 }
 @end
 
@@ -23,7 +23,6 @@
 -(void)deleteCategoryWithId:(NSInteger)categoryId
 {
     [availableCategories removeObjectAtIndex:categoryId];
-    [NSKeyedArchiver archiveRootObject:availableCategories toFile:categoryFile];
     
     [self.navigationController popViewControllerAnimated:YES];
     [self.tableView reloadData];
@@ -34,8 +33,7 @@
 -(void)didAddCategory:(InventoryCategory *)category
 {
     [availableCategories addObject:category];
-    [NSKeyedArchiver archiveRootObject:availableCategories toFile:categoryFile];
-
+    [dbManager insertIntoCategoryTable:category];
     NSIndexPath *indexPath = [NSIndexPath indexPathForRow:[availableCategories count] -1 inSection:0];
     [self.tableView insertRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -59,23 +57,19 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    //Check if there is a file present with the list of categories
-    //if not then create the categories here
-    NSString *documentsDir = [self applicationDocumentsDirectory];
-    
-    categoryFile = [NSString stringWithFormat:@"%@/%@", documentsDir, CATEGORY_FILE];
-    
-    if ([[NSFileManager defaultManager] fileExistsAtPath:categoryFile]) {
-        availableCategories = [NSKeyedUnarchiver unarchiveObjectWithFile:categoryFile];
-    } else {
-        [self createDefaultCategories];
-    }
+
+    dbManager = [[DBManager alloc] init];
+    // Hide the search bar until user scrolls up
+    CGRect newBounds = self.tableView.bounds;
+    newBounds.origin.y = newBounds.origin.y +  self.searchDisplayController.searchBar.bounds.size.height;
+    self.tableView.bounds = newBounds;
 }
 
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+    availableCategories = [dbManager getAllCategories];
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
 }
 
@@ -83,11 +77,6 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
--(NSString *) applicationDocumentsDirectory
-{
-    return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
 }
 
 #pragma mark - Table view data source
@@ -115,7 +104,7 @@
     
     InventoryCategory *inventoryCategory = [availableCategories objectAtIndex:indexPath.row];
     cell.mNameLabel.text = inventoryCategory.name;
-    cell.mImageView.image = inventoryCategory.image;
+    cell.mImageView.image = [UIImage imageNamed:inventoryCategory.imageName];
     // Configure the cell...
     
     return cell;
@@ -135,21 +124,28 @@
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
+        //Update all the items with this category to General category
+        
+        InventoryCategory *inventoryCategory = (InventoryCategory *)[availableCategories objectAtIndex:indexPath.row];
+        
+        [dbManager deleteCategoryWithId:inventoryCategory.categoryId];
+
         [availableCategories removeObjectAtIndex:indexPath.row];
-        [NSKeyedArchiver archiveRootObject:availableCategories toFile:categoryFile];
+        
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
     }
 }
+
+#pragma mark - Search Bar Delegates -
 
 -(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
 {
     [self.tableView reloadData];
 }
 
-
--(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+-(void)searchDisplayController:(UISearchDisplayController *)controller willShowSearchResultsTableView:(UITableView *)tableView
 {
-
+    tableView.rowHeight = 66.0f;
 }
 
 #pragma mark - Navigation
@@ -167,21 +163,8 @@
         CategoryDetailsViewController *categoryDetailsViewController = (CategoryDetailsViewController *)segue.destinationViewController;
         categoryDetailsViewController.delegate = self;
         categoryDetailsViewController.categoryId = [self.tableView indexPathForSelectedRow].row;
+        categoryDetailsViewController.category = [availableCategories objectAtIndex:categoryDetailsViewController.categoryId];
     }
 }
-
-#pragma mark -
-
--(void) createDefaultCategories
-{
-    availableCategories = [NSMutableArray arrayWithObjects:
-                           [[InventoryCategory alloc] initWithName:@"General" withImage:[UIImage imageNamed:@"Object.png"]],
-                           [[InventoryCategory alloc] initWithName:@"Books" withImage:[UIImage imageNamed:@"category_books.png"]],
-                           [[InventoryCategory alloc] initWithName:@"Clothing" withImage:[UIImage imageNamed:@"category_clothing.png"]],
-                           [[InventoryCategory alloc] initWithName:@"Electronics" withImage:[UIImage imageNamed:@"Object.png"]],
-                           [[InventoryCategory alloc] initWithName:@"Entertainment" withImage:[UIImage imageNamed:@"category_entertainment.png"]], nil];
-    [NSKeyedArchiver archiveRootObject:availableCategories toFile:categoryFile];
-}
-
 
 @end
