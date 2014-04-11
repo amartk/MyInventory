@@ -20,13 +20,13 @@
 
 @implementation CategoryViewController
 
--(void)deleteCategoryWithId:(NSInteger)categoryId
-{
-    [availableCategories removeObjectAtIndex:categoryId];
-    
-    [self.navigationController popViewControllerAnimated:YES];
-    [self.tableView reloadData];
-}
+//-(void)deleteCategoryWithId:(NSInteger)categoryId
+//{
+//    [availableCategories removeObjectAtIndex:categoryId];
+//    
+//    [self.navigationController popViewControllerAnimated:YES];
+//    [self.tableView reloadData];
+//}
 
 #pragma mark - NewCategoryViewControllerDelegate -
 
@@ -44,7 +44,6 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-
 - (id)initWithStyle:(UITableViewStyle)style
 {
     self = [super initWithStyle:style];
@@ -57,8 +56,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-
     dbManager = [[DBManager alloc] init];
+    
     // Hide the search bar until user scrolls up
     CGRect newBounds = self.tableView.bounds;
     newBounds.origin.y = newBounds.origin.y +  self.searchDisplayController.searchBar.bounds.size.height;
@@ -68,7 +67,6 @@
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
     availableCategories = [dbManager getAllCategories];
     self.navigationItem.leftBarButtonItem = self.editButtonItem;
 }
@@ -161,7 +159,7 @@
         
     } else  if ([segue.identifier isEqualToString:@"DetailCategory"]) {
         CategoryDetailsViewController *categoryDetailsViewController = (CategoryDetailsViewController *)segue.destinationViewController;
-        categoryDetailsViewController.delegate = self;
+        //categoryDetailsViewController.delegate = self;
         categoryDetailsViewController.categoryId = [self.tableView indexPathForSelectedRow].row;
         categoryDetailsViewController.category = [availableCategories objectAtIndex:categoryDetailsViewController.categoryId];
     }

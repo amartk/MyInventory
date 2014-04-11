@@ -8,9 +8,13 @@
 
 #import "PieChartViewController.h"
 #import "InventoryCategory.h"
+#import "DBManager.h"
 
 @interface PieChartViewController ()
-
+{
+    DBManager *dbManager;
+    NSMutableDictionary *countOfItems;
+}
 @property (nonatomic, strong) CPTGraphHostingView *hostView;
 @property (nonatomic, strong) CPTTheme *selectedTheme;
 
@@ -31,13 +35,17 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    dbManager = [[DBManager alloc] init];
 	// Do any additional setup after loading the view.
-    [self initPieChart];
 }
 
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+     _availableCategories = [dbManager getAllCategories];
+    countOfItems = [dbManager getCountOfItemsInEachCategory];
+    [self initPieChart];
+
     self.title = @"Category";
 }
 
@@ -51,18 +59,13 @@
 
 -(NSUInteger)numberOfRecordsForPlot:(CPTPlot *)plot
 {
-    NSString *categoryFile = [NSString stringWithFormat:@"%@/%@", [self applicationDocumentsDirectory], CATEGORY_FILE];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:categoryFile]) {
-        _availableCategories = [NSKeyedUnarchiver unarchiveObjectWithFile:categoryFile];
-        return _availableCategories.count;
-    }
-    
-    return 0;
+    return countOfItems.count;
+
 }
 
 -(NSNumber *)numberForPlot:(CPTPlot *)plot field:(NSUInteger)fieldEnum recordIndex:(NSUInteger)idx
 {
-    return [NSNumber numberWithInt:12];
+    return [countOfItems objectForKey:[[countOfItems allKeys] objectAtIndex:idx]];
 }
 
 -(CPTLayer *)dataLabelForPlot:(CPTPlot *)plot recordIndex:(NSUInteger)idx
@@ -72,25 +75,29 @@
 		labelText= [[CPTMutableTextStyle alloc] init];
 		labelText.color = [CPTColor grayColor];
 	}
-	// 5 - Create and return layer with label text
-    InventoryCategory *inventoryCategory = [_availableCategories objectAtIndex:idx];
+	//Create and return layer with label text
+    NSInteger index =  [[[countOfItems allKeys] objectAtIndex:idx] intValue];
+    InventoryCategory *categoryName = [_availableCategories objectAtIndex:index - 1];
     NSString *label;
-    if ([inventoryCategory.name length] <= 9) {
-        label = inventoryCategory.name;
+    if ([categoryName.name length] <= 9) {
+        label = [NSString stringWithFormat:@"%@(%d)",categoryName.name, [[countOfItems objectForKey:[[countOfItems allKeys] objectAtIndex:idx]] intValue]];
+
     } else {
-        label = [NSString stringWithFormat:@"%@...",[inventoryCategory.name substringToIndex:6]];
+        label = [NSString stringWithFormat:@"%@...(%d)",[categoryName.name substringToIndex:6], [[countOfItems objectForKey:[[countOfItems allKeys] objectAtIndex:idx]] intValue]];
     }
 	return [[CPTTextLayer alloc] initWithText:label style:labelText];
 }
 
 -(NSString *)legendTitleForPieChart:(CPTPieChart *)pieChart recordIndex:(NSUInteger)idx
 {
-    InventoryCategory *inventoryCategory = [_availableCategories objectAtIndex:idx];
+    NSInteger index =  [[[countOfItems allKeys] objectAtIndex:idx] intValue];
+    InventoryCategory *categoryName = [_availableCategories objectAtIndex:index - 1];
+
     NSString *legendTitle;
-    if ([inventoryCategory.name length] <= 12) {
-        legendTitle = inventoryCategory.name;
+    if ([categoryName.name length] <= 12) {
+        legendTitle = [NSString stringWithFormat:@"%@(%d)",categoryName.name, [[countOfItems objectForKey:[[countOfItems allKeys] objectAtIndex:idx]] intValue]];
     } else {
-        legendTitle = [NSString stringWithFormat:@"%@...",[inventoryCategory.name substringToIndex:8]];
+        legendTitle = [NSString stringWithFormat:@"%@...(%d)",[categoryName.name substringToIndex:8], [[countOfItems objectForKey:[[countOfItems allKeys] objectAtIndex:idx]] intValue]];
     }
 	return legendTitle;
 }
@@ -99,6 +106,7 @@
 
 -(void)pieChart:(CPTPieChart *)plot sliceWasSelectedAtRecordIndex:(NSUInteger)idx withEvent:(UIEvent *)event
 {
+    NSLog(@"%d %@", idx, event);
 }
 
 

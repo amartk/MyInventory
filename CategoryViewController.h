@@ -10,6 +10,6 @@
 #import "NewCategoryViewController.h"
 #import "CategoryDetailsViewController.h"
 
-@interface CategoryViewController : UITableViewController <NewCategoryViewControllerDelegate, UISearchBarDelegate, UISearchDisplayDelegate, CategoryDetailsViewControllerDelegate>
+@interface CategoryViewController : UITableViewController <NewCategoryViewControllerDelegate, UISearchBarDelegate, UISearchDisplayDelegate>
 
 @end

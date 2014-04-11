@@ -32,6 +32,7 @@
         [inventoryItem setVendor:[_vendor copyWithZone:zone]];
         [inventoryItem setLocation:[_location copyWithZone:zone]];
         [inventoryItem setCategoryId:_categoryId];
+        [inventoryItem setQuantity:_quantity];
         [inventoryItem setCategoryName:[_categoryName copyWithZone:zone]];
         [inventoryItem setNotes:[_notes copyWithZone:zone]];
         [inventoryItem setImageName:[_imageName copyWithZone:zone]];

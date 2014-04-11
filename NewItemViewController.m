@@ -40,22 +40,14 @@
 -(void)addNewItem:(id)sender
 {
     InventoryItem *inventoryItem = [[InventoryItem alloc] init];
-    inventoryItem.name = @"da vinci code";
-   /*
-    @property(nonatomic, strong) NSString *name, *vendor, *location, *category;
-    @property(nonatomic, strong) NSDate *purchaseDate;
-    @property(nonatomic, strong) UIImage *image;
-    @property(nonatomic) NSInteger quantity;
-    @property(nonatomic) CGFloat *price;
-    */
-
-    inventoryItem.categoryId = 2;
+    inventoryItem.name = @"head set";
+    inventoryItem.categoryId = 4;
     inventoryItem.quantity = 3;
     inventoryItem.price = 1200.0f;
     inventoryItem.imageName = @"object.png";
     
-    inventoryItem.location = @"Adyar";
-    inventoryItem.vendor = @"LifeStyle";
+    inventoryItem.location = @"mylapore";
+    inventoryItem.vendor = @"jabong";
     inventoryItem.purchaseDate = [NSDate date];
     inventoryItem.warrantyDate = [NSDate date];
     inventoryItem.tag = @"simple tag ";

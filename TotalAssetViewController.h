@@ -7,12 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SortPickerViewController.h"
 
-@interface TotalAssetViewController : UITableViewController <SorterPickerDelegate>
+@interface TotalAssetViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
-@property(nonatomic, strong) UIPopoverController *sorterPickerPopOver;
-@property(nonatomic, strong) SortPickerViewController *sorterPickerViewController;
+@property(nonatomic, weak) IBOutlet UITableView *splitterTableView;
+@property (weak, nonatomic) IBOutlet UILabel *totalWorthLabel;
 
 -(IBAction)chooseSortFieldTapped:(id)sender;
 

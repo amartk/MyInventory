@@ -37,8 +37,6 @@
 
 -(void)deleteItem:(id)sender
 {
-    //Delete the item here
-    //[self.navigationController popViewControllerAnimated:YES];
     [_delegate deleteItemWithId:_inventoryItem.itemId];
 }
 @end

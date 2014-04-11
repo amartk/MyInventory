@@ -16,7 +16,7 @@
 
 @interface ItemsViewController ()
 {
-    NSMutableArray *availableItems;
+    NSMutableDictionary *availableItems;
     DBManager *dbManager;
 }
 @end
@@ -42,8 +42,8 @@
 {
     [super viewWillAppear:animated];
     
+    availableItems = [[dbManager getAllItems] objectForKey:@"ITEMS_LIST"];
     
-    availableItems = [dbManager getAllItems];
     [self.tableView reloadData];
     
     if (availableItems.count > 0) {
@@ -71,13 +71,28 @@
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     // Return the number of sections.
-    return 1;
+    return [[availableItems allKeys] count];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    return availableItems.count;
+    return [[availableItems valueForKey:[[[availableItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:section]] count];
+}
+
+-(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return [[[availableItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:section];
+}
+
+-(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UIView *headerView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, tableView.frame.size.width, 18)];
+    UILabel *headerLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, 3, tableView.frame.size.width, 18)];
+    [headerLabel setFont:[UIFont systemFontOfSize:13]];
+    [headerLabel setText:[[[[availableItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:section] uppercaseString]];
+    [headerView addSubview:headerLabel];
+    return headerView;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -89,8 +104,7 @@
         cell = (ItemsCell *)[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
-    InventoryItem *inventoryItem = (InventoryItem *)[availableItems objectAtIndex:indexPath.row];
-    //cell.itemName.text = inventoryItem.name ;
+    InventoryItem *inventoryItem = (InventoryItem *)[[availableItems valueForKey:[[[availableItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:indexPath.section]] objectAtIndex:indexPath.row];
     cell.itemName.text = [NSString stringWithFormat:@"%@ %@", inventoryItem.name , inventoryItem.categoryName];
     cell.itemImage.image = [UIImage imageNamed:inventoryItem.imageName];
     
@@ -107,17 +121,20 @@
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         //remove the item from DB
-        InventoryItem *inventoryItem = (InventoryItem *)[availableItems objectAtIndex:indexPath.row];
+        InventoryItem *inventoryItem = (InventoryItem *)[[availableItems valueForKey:[[[availableItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:indexPath.section]] objectAtIndex:indexPath.row];
         
         [dbManager deleteItemWithId:inventoryItem.itemId];
         
-        [availableItems removeObjectAtIndex:indexPath.row];
+        [[availableItems valueForKey:[[availableItems allKeys] objectAtIndex:indexPath.section]] removeObjectAtIndex:indexPath.row];
+        
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
 
         if (availableItems.count == 0) {
             self.navigationItem.leftBarButtonItem = nil;
         }
         
+        availableItems = [[dbManager getAllItems] objectForKey:@"ITEMS_LIST"];
+        [tableView reloadData];
     }
 }
 
@@ -138,7 +155,7 @@
         
         DetailItemsViewController *detailItemsViewController = (DetailItemsViewController *)segue.destinationViewController;
         NSIndexPath *path = [self.tableView indexPathForSelectedRow];
-        InventoryItem *item = [availableItems objectAtIndex:path.row];
+        InventoryItem *item = [[availableItems valueForKey:[[[availableItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:path.section]] objectAtIndex:path.row];
         detailItemsViewController.inventoryItem = item;
         detailItemsViewController.delegate = self;
     }
@@ -150,7 +167,7 @@
 -(void)newItemAdded:(InventoryItem *)inventoryItem
 {
     inventoryItem.itemId = [dbManager insertIntoItemsTable:inventoryItem];
-    [availableItems addObject:inventoryItem];
+    [[availableItems objectForKey:[inventoryItem.name substringToIndex:1]] addObject:inventoryItem];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 

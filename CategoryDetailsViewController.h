@@ -8,19 +8,22 @@
 
 #import <UIKit/UIKit.h>
 #import "InventoryCategory.h"
+#import "NewItemViewController.h"
+//@protocol CategoryDetailsViewControllerDelegate <NSObject>
 
-@protocol CategoryDetailsViewControllerDelegate <NSObject>
+//-(void)deleteCategoryWithId:(NSInteger) categoryId;
 
--(void)deleteCategoryWithId:(NSInteger) categoryId;
+//@end
 
-@end
-
-@interface CategoryDetailsViewController : UIViewController
+@interface CategoryDetailsViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UITextViewDelegate, NewItemDelegate>
 
 @property(nonatomic) NSInteger categoryId;
 @property(nonatomic, strong) InventoryCategory *category;
-@property(nonatomic, weak) id<CategoryDetailsViewControllerDelegate> delegate;
+//@property(nonatomic, weak) id<CategoryDetailsViewControllerDelegate> delegate;
+@property (weak, nonatomic) IBOutlet UIImageView *categoryImage;
+@property (weak, nonatomic) IBOutlet UITextView *categoryDescriptionTextView;
+@property (weak, nonatomic) IBOutlet UITableView *categoryItemsTableView;
 
-- (IBAction)deleteCategory:(id)sender;
+//- (IBAction)deleteCategory:(id)sender;
 
 @end

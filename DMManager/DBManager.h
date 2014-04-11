@@ -14,11 +14,15 @@
 @interface DBManager : NSObject
 
 -(NSInteger)insertIntoItemsTable:(InventoryItem *)inventoryItem;
--(NSMutableArray *)getAllItems;
+-(NSMutableDictionary *)getAllItems;
+-(NSMutableDictionary *)getAllItemsWithCategory:(NSInteger)categoryId;
 -(void)deleteItemWithId:(NSInteger)itemId;
 
 -(NSInteger)insertIntoCategoryTable:(InventoryCategory *)inventoryCategory;
 -(NSMutableArray *)getAllCategories;
 -(void)deleteCategoryWithId:(NSInteger)categoryId;
+-(NSMutableDictionary *)getCountOfItemsInEachCategory;
+-(NSMutableDictionary *)getCountOfItemsInEachVendor;
 
+-(void)updateCategoryDescriptionTo:(NSString *)categoryDesc forCategory:(NSInteger)categoryId;
 @end
