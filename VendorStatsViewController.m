@@ -79,10 +79,10 @@
     NSString *vendorName = [_availableVendors objectAtIndex:idx];
     NSString *label;
     if ([vendorName length] <= 9) {
-        label = [NSString stringWithFormat:@"%@(%d)",vendorName, [[countOfItems objectForKey:[[[countOfItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:idx]] intValue]];
+        label = [NSString stringWithFormat:@"%@(%d)", vendorName, [[countOfItems objectForKey:[[[countOfItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:idx]] intValue]];
 
     } else {
-        label = [NSString stringWithFormat:@"%@...%d",[vendorName substringToIndex:6], [[countOfItems objectForKey:[[[countOfItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:idx]] intValue]];
+        label = [NSString stringWithFormat:@"%@...", [vendorName substringToIndex:6]];
     }
 	return [[CPTTextLayer alloc] initWithText:label style:labelText];
 }
@@ -93,9 +93,9 @@
     NSString *legendTitle;
     
     if ([vendorName length] <= 12) {
-        legendTitle = [NSString stringWithFormat:@"%@(%d)",vendorName, [[countOfItems objectForKey:[[[countOfItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:idx]] intValue]];
+        legendTitle = [NSString stringWithFormat:@"%@(%d)", vendorName, [[countOfItems objectForKey:[[[countOfItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:idx]] intValue]];
     } else {
-        legendTitle = [NSString stringWithFormat:@"%@...(%d)",[vendorName substringToIndex:8], [[countOfItems objectForKey:[[[countOfItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:idx]] intValue]];
+        legendTitle = [NSString stringWithFormat:@"%@...", [vendorName substringToIndex:8]];
     }
 	return legendTitle;
 }

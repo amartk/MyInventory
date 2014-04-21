@@ -80,10 +80,10 @@
     InventoryCategory *categoryName = [_availableCategories objectAtIndex:index - 1];
     NSString *label;
     if ([categoryName.name length] <= 9) {
-        label = [NSString stringWithFormat:@"%@(%d)",categoryName.name, [[countOfItems objectForKey:[[countOfItems allKeys] objectAtIndex:idx]] intValue]];
+        label = [NSString stringWithFormat:@"%@(%d)", categoryName.name, [[countOfItems objectForKey:[[countOfItems allKeys] objectAtIndex:idx]] intValue]];
 
     } else {
-        label = [NSString stringWithFormat:@"%@...(%d)",[categoryName.name substringToIndex:6], [[countOfItems objectForKey:[[countOfItems allKeys] objectAtIndex:idx]] intValue]];
+        label = [NSString stringWithFormat:@"%@...", [categoryName.name substringToIndex:6]];
     }
 	return [[CPTTextLayer alloc] initWithText:label style:labelText];
 }
@@ -95,9 +95,9 @@
 
     NSString *legendTitle;
     if ([categoryName.name length] <= 12) {
-        legendTitle = [NSString stringWithFormat:@"%@(%d)",categoryName.name, [[countOfItems objectForKey:[[countOfItems allKeys] objectAtIndex:idx]] intValue]];
+        legendTitle = [NSString stringWithFormat:@"%@(%d)", categoryName.name, [[countOfItems objectForKey:[[countOfItems allKeys] objectAtIndex:idx]] intValue]];
     } else {
-        legendTitle = [NSString stringWithFormat:@"%@...(%d)",[categoryName.name substringToIndex:8], [[countOfItems objectForKey:[[countOfItems allKeys] objectAtIndex:idx]] intValue]];
+        legendTitle = [NSString stringWithFormat:@"%@...", [categoryName.name substringToIndex:8]];
     }
 	return legendTitle;
 }

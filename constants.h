@@ -15,4 +15,6 @@
 #define APPLICATION_DOC_DIRECTORY   [NSString stringWithFormat:@"%@", [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject]]
 #define DATABASE_NAME               @"myInventory.sqlite"
 
+#define IS_IOS_7_OR_LATER                           ([[[UIDevice currentDevice] systemVersion] floatValue] >= 7.0)
+
 #endif

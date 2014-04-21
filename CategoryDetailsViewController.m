@@ -58,20 +58,8 @@
     self.title = _category.name;
 
     availableItems = [dbManager getAllItemsWithCategory:_category.categoryId];
-    
-    if (availableItems.count > 0) {
-        [[self.view viewWithTag:NO_ITEMS_LABEL_TAG] removeFromSuperview];
-        _categoryItemsTableView.alwaysBounceVertical = NO;
-        [_categoryItemsTableView reloadData];
-    } else {
-        _categoryItemsTableView.alwaysBounceVertical = NO;
-        UILabel *noItemsLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-        noItemsLabel.text = @"No items added to this category";
-        [noItemsLabel sizeToFit];
-        noItemsLabel.center = self.view.center;
-        [noItemsLabel setTag:NO_ITEMS_LABEL_TAG];
-        [self.view addSubview:noItemsLabel];
-    }
+    [self handleZeroItems];
+    [_categoryItemsTableView reloadData];
 }
 
 -(void)viewWillDisappear:(BOOL)animated
@@ -87,6 +75,23 @@
     // Dispose of any resources that can be recreated.
 }
 
+-(void)handleZeroItems
+{
+    [[self.view viewWithTag:NO_ITEMS_LABEL_TAG] removeFromSuperview];
+    if (availableItems.count > 0) {
+        _categoryItemsTableView.alwaysBounceVertical = NO;
+    } else {
+        _categoryItemsTableView.alwaysBounceVertical = NO;
+        UILabel *noItemsLabel = [[UILabel alloc] initWithFrame:CGRectZero];
+        noItemsLabel.text = @"No items added to this category";
+        [noItemsLabel sizeToFit];
+        noItemsLabel.center = self.view.center;
+        [noItemsLabel setTag:NO_ITEMS_LABEL_TAG];
+        [self.view addSubview:noItemsLabel];
+    }
+}
+
+
 -(void)setcategoryTableViewBorder
 {
     CALayer *layer = _categoryItemsTableView.layer;
@@ -95,11 +100,6 @@
     layer.cornerRadius = 8;
     layer.masksToBounds = YES;
 }
-
-//- (IBAction)deleteCategory:(id)sender {
-//    [_delegate deleteCategoryWithId:_categoryId];
-//}
-
 
 #pragma mark - Table view data source -
 
@@ -148,9 +148,10 @@
         [[availableItems valueForKey:[[availableItems allKeys] objectAtIndex:indexPath.section]] removeObjectAtIndex:indexPath.row];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
         
-        if (availableItems.count == 0) {
-            self.navigationItem.leftBarButtonItem = nil;
-        }
+        availableItems = [dbManager getAllItemsWithCategory:_category.categoryId];
+
+        [self handleZeroItems];
+        [_categoryItemsTableView reloadData];
     }
 }
 

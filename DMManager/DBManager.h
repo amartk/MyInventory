@@ -23,6 +23,7 @@
 -(void)deleteCategoryWithId:(NSInteger)categoryId;
 -(NSMutableDictionary *)getCountOfItemsInEachCategory;
 -(NSMutableDictionary *)getCountOfItemsInEachVendor;
-
+-(NSMutableDictionary *)getCountOfItemsInEachLocation;
+-(NSMutableArray *)getItemsSortedByWarrantyDate;
 -(void)updateCategoryDescriptionTo:(NSString *)categoryDesc forCategory:(NSInteger)categoryId;
 @end

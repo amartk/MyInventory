@@ -11,7 +11,7 @@
 @interface InventoryItem : NSObject<NSCopying>
 
 @property(nonatomic, strong) NSString *name, *vendor, *location, *notes, *imageName, *tag, *categoryName;
-@property(nonatomic, strong) NSDate *purchaseDate, *warrantyDate;
+@property(nonatomic, strong) NSString *purchaseDate, *warrantyDate;
 @property(nonatomic) NSInteger itemId, quantity, categoryId;
 @property(nonatomic) float price;
 

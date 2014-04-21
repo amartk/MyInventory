@@ -8,14 +8,16 @@
 
 #import "LocationStatsViewController.h"
 #import "InventoryCategory.h"
-
+#import "DMManager/DBManager.h"
 @interface LocationStatsViewController ()
-
+{
+    DBManager *dbManager;
+    NSMutableDictionary *countOfItems;
+}
 @property (nonatomic, strong) CPTGraphHostingView *hostView;
 @property (nonatomic, strong) CPTTheme *selectedTheme;
 
-@property (nonatomic, strong) NSArray *availableCategories;
-
+@property (nonatomic, strong) NSArray *availableLocations;
 @end
 
 @implementation LocationStatsViewController
@@ -33,13 +35,19 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view.
-    [self initPieChart];
+    dbManager = [[DBManager alloc] init];
 }
 
 -(void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    self.title = @"Location";
+    
+    countOfItems = [dbManager getCountOfItemsInEachLocation];
+    _availableLocations = [[countOfItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)];
+    
+    [self initPieChart];
+    
+    self.title = @"Location Statistics";
 }
 
 - (void)didReceiveMemoryWarning
@@ -52,18 +60,12 @@
 
 -(NSUInteger)numberOfRecordsForPlot:(CPTPlot *)plot
 {
-    NSString *categoryFile = [NSString stringWithFormat:@"%@/%@", [self applicationDocumentsDirectory], CATEGORY_FILE];
-    if ([[NSFileManager defaultManager] fileExistsAtPath:categoryFile]) {
-        _availableCategories = [NSKeyedUnarchiver unarchiveObjectWithFile:categoryFile];
-        return _availableCategories.count;
-    }
-    
-    return 0;
+    return countOfItems.count;
 }
 
 -(NSNumber *)numberForPlot:(CPTPlot *)plot field:(NSUInteger)fieldEnum recordIndex:(NSUInteger)idx
 {
-    return [NSNumber numberWithInt:12];
+    return [countOfItems objectForKey:[[[countOfItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:idx]];
 }
 
 -(CPTLayer *)dataLabelForPlot:(CPTPlot *)plot recordIndex:(NSUInteger)idx
@@ -73,25 +75,27 @@
 		labelText= [[CPTMutableTextStyle alloc] init];
 		labelText.color = [CPTColor grayColor];
 	}
-	// 5 - Create and return layer with label text
-    InventoryCategory *inventoryCategory = [_availableCategories objectAtIndex:idx];
+	//Create and return layer with label text
+    NSString *locationName = [_availableLocations objectAtIndex:idx];
     NSString *label;
-    if ([inventoryCategory.name length] <= 9) {
-        label = inventoryCategory.name;
+    if ([locationName length] <= 9) {
+        label = [NSString stringWithFormat:@"%@(%d)", locationName, [[countOfItems objectForKey:[[[countOfItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:idx]] intValue]];
+        
     } else {
-        label = [NSString stringWithFormat:@"%@...",[inventoryCategory.name substringToIndex:6]];
+        label = [NSString stringWithFormat:@"%@...", [locationName substringToIndex:6]];
     }
 	return [[CPTTextLayer alloc] initWithText:label style:labelText];
 }
 
 -(NSString *)legendTitleForPieChart:(CPTPieChart *)pieChart recordIndex:(NSUInteger)idx
 {
-    InventoryCategory *inventoryCategory = [_availableCategories objectAtIndex:idx];
+    NSString *locationName = [_availableLocations objectAtIndex:idx];
     NSString *legendTitle;
-    if ([inventoryCategory.name length] <= 12) {
-        legendTitle = inventoryCategory.name;
+    
+    if ([locationName length] <= 12) {
+        legendTitle = [NSString stringWithFormat:@"%@(%d)", locationName, [[countOfItems objectForKey:[[[countOfItems allKeys] sortedArrayUsingSelector:@selector(localizedCaseInsensitiveCompare:)] objectAtIndex:idx]] intValue]];
     } else {
-        legendTitle = [NSString stringWithFormat:@"%@...",[inventoryCategory.name substringToIndex:8]];
+        legendTitle = [NSString stringWithFormat:@"%@...", [locationName substringToIndex:8]];
     }
 	return legendTitle;
 }
@@ -135,7 +139,7 @@
     titleStyle.fontName = @"Helvetica-Bold";
     titleStyle.fontSize = 16.0f;
     
-    graph.title = @"Items purchased at each location";
+    graph.title = @"Items purchased from each vendor";
     graph.titleTextStyle = titleStyle;
     graph.titleDisplacement = CGPointMake(0, -50);
     
@@ -173,5 +177,4 @@
 }
 
 @end
-
 

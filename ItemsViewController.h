@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "NewItemViewController.h"
 #import "DetailItemsViewController.h"
-@interface ItemsViewController : UITableViewController <NewItemDelegate, DetailItemsDelegate>
+
+@interface ItemsViewController : UITableViewController <NewItemDelegate, DetailItemsDelegate, UISearchBarDelegate, UISearchDisplayDelegate>
 
 @end

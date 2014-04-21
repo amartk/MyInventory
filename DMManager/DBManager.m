@@ -63,11 +63,11 @@
             inventoryItem.quantity = [resultSet intForColumn:@"quantity"];
             inventoryItem.price = [resultSet doubleForColumn:@"price"];
             inventoryItem.imageName = [resultSet stringForColumn:@"imageName"];
-            inventoryItem.purchaseDate = [resultSet dateForColumn:@"purchaseDate"];
+            inventoryItem.purchaseDate = [resultSet stringForColumn:@"purchaseDate"];
             inventoryItem.location = [resultSet stringForColumn:@"location"];
             inventoryItem.vendor = [resultSet stringForColumn:@"vendor"];
             inventoryItem.notes = [resultSet stringForColumn:@"notes"];
-            inventoryItem.warrantyDate = [resultSet dateForColumn:@"warrantyDate"];
+            inventoryItem.warrantyDate = [resultSet stringForColumn:@"warrantyDate"];
             inventoryItem.tag = [resultSet stringForColumn:@"tag"];
             
             totalValue += inventoryItem.quantity * inventoryItem.price;
@@ -116,11 +116,11 @@
             inventoryItem.quantity = [resultSet intForColumn:@"quantity"];
             inventoryItem.price = [resultSet doubleForColumn:@"price"];
             inventoryItem.imageName = [resultSet stringForColumn:@"imageName"];
-            inventoryItem.purchaseDate = [resultSet dateForColumn:@"purchaseDate"];
+            inventoryItem.purchaseDate = [resultSet stringForColumn:@"purchaseDate"];
             inventoryItem.location = [resultSet stringForColumn:@"location"];
             inventoryItem.vendor = [resultSet stringForColumn:@"vendor"];
             inventoryItem.notes = [resultSet stringForColumn:@"notes"];
-            inventoryItem.warrantyDate = [resultSet dateForColumn:@"warrantyDate"];
+            inventoryItem.warrantyDate = [resultSet stringForColumn:@"warrantyDate"];
             inventoryItem.tag = [resultSet stringForColumn:@"tag"];
             
             
@@ -270,6 +270,56 @@
         [database close];
     }
     return countOfItems;
+}
+
+-(NSMutableDictionary *)getCountOfItemsInEachLocation
+{
+    NSMutableDictionary *countOfItems = [[NSMutableDictionary alloc] init];
+    
+    if ([database open]) {
+        
+        NSString *query = [NSString stringWithFormat:@"SELECT location, count(*) as count FROM mi_items group by location order by location"];
+        FMResultSet *resultSet = [database executeQuery:query];
+        
+        while ([resultSet next]) {
+            [countOfItems setObject:[NSNumber numberWithInteger:[resultSet intForColumn:@"count"]] forKey:[resultSet stringForColumn:@"location"]];
+            
+        }
+        
+        [database close];
+    }
+    return countOfItems;
+}
+
+-(NSMutableArray *)getItemsSortedByWarrantyDate
+{
+    NSMutableArray *inventoryItems = [[NSMutableArray alloc] init];
+    if ([database open]) {
+        NSString *query = [NSString stringWithFormat:@"SELECT * FROM mi_items ORDER BY warrantyDate"];
+        FMResultSet *resultSet = [database executeQuery:query];
+        InventoryItem *inventoryItem = [[InventoryItem alloc] init];
+        while ([resultSet next]) {
+            
+            inventoryItem.itemId = [resultSet intForColumn:@"id"];
+            inventoryItem.name = [resultSet stringForColumn:@"name"];
+            inventoryItem.quantity = [resultSet intForColumn:@"quantity"];
+            inventoryItem.price = [resultSet doubleForColumn:@"price"];
+            inventoryItem.imageName = [resultSet stringForColumn:@"imageName"];
+            inventoryItem.purchaseDate = [resultSet stringForColumn:@"purchaseDate"];
+            inventoryItem.location = [resultSet stringForColumn:@"location"];
+            inventoryItem.vendor = [resultSet stringForColumn:@"vendor"];
+            inventoryItem.notes = [resultSet stringForColumn:@"notes"];
+            inventoryItem.warrantyDate = [resultSet stringForColumn:@"warrantyDate"];
+            inventoryItem.tag = [resultSet stringForColumn:@"tag"];
+            
+            [inventoryItems addObject:[inventoryItem copy]];
+        }
+        
+        
+        [database close];
+    }
+    
+    return inventoryItems;
 }
 
 

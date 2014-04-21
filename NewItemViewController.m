@@ -40,16 +40,20 @@
 -(void)addNewItem:(id)sender
 {
     InventoryItem *inventoryItem = [[InventoryItem alloc] init];
-    inventoryItem.name = @"head set";
-    inventoryItem.categoryId = 4;
-    inventoryItem.quantity = 3;
-    inventoryItem.price = 1200.0f;
+    inventoryItem.name = @"da vinci code";
+    inventoryItem.categoryId = 2;
+    inventoryItem.quantity = 1;
+    inventoryItem.price = 200.0f;
     inventoryItem.imageName = @"object.png";
     
-    inventoryItem.location = @"mylapore";
-    inventoryItem.vendor = @"jabong";
-    inventoryItem.purchaseDate = [NSDate date];
-    inventoryItem.warrantyDate = [NSDate date];
+    inventoryItem.location = @"tambram";
+    inventoryItem.vendor = @"landmark";
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"dd/MM/yyyy"];
+    
+    inventoryItem.purchaseDate = [dateFormatter stringFromDate:[NSDate date]];
+    inventoryItem.warrantyDate = @"23/04/2014";
     inventoryItem.tag = @"simple tag ";
     inventoryItem.notes = @"This is a simple note for this item";
     [_delegate newItemAdded:inventoryItem];
